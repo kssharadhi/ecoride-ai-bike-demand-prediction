@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+data/
+# Keep the trained model and metrics in Git for deployment.
