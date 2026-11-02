@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcoRide AI | Bike Demand Predictor</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f2f7f5;color:#17352c}
+header{background:#123f32;color:white;padding:28px max(6%,calc((100% - 1050px)/2))}
+header h1{margin:0;font-size:30px}header p{margin:8px 0 0;color:#d8eee5}
+main{max-width:1050px;margin:32px auto;padding:0 18px;display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+.card{background:white;border-radius:16px;padding:24px;box-shadow:0 8px 28px #163d2b12}
+h2{margin-top:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-size:13px;font-weight:bold;display:block;margin-bottom:6px}
+input,select{width:100%;padding:11px;border:1px solid #cad9d2;border-radius:8px;background:white}
+button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:9px;background:#ed8b36;color:#172f25;font-weight:bold;font-size:16px;cursor:pointer}
+.result{background:#e8f5ed;border-radius:12px;padding:20px;text-align:center;margin-top:16px}
+.number{font-size:44px;font-weight:bold;color:#146343}.muted{color:#62776d;line-height:1.5}
+.error{color:#b42318;background:#fff0ee;padding:10px;border-radius:8px}
+footer{text-align:center;color:#708078;padding:20px;font-size:12px}
+@media(max-width:760px){main{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><h1>🚲 EcoRide AI</h1><p>Smart hourly bike-rental demand prediction</p></header>
+<main>
+<section class="card">
+<h2>Enter conditions</h2>
+<p class="muted">Choose the expected time and weather conditions to estimate hourly rentals.</p>
+<form method="POST">
+<div class="grid">
+<div><label>Season</label><select name="season">{% for n,t in [(1,'Spring'),(2,'Summer'),(3,'Fall'),(4,'Winter')] %}<option value="{{n}}" {% if values.season==n %}selected{% endif %}>{{t}}</option>{% endfor %}</select></div>
+<div><label>Year</label><select name="yr"><option value="0" {% if values.yr==0 %}selected{% endif %}>2011</option><option value="1" {% if values.yr==1 %}selected{% endif %}>2012</option></select></div>
+<div><label>Month (1–12)</label><input type="number" name="mnth" min="1" max="12" value="{{values.mnth}}" required></div>
+<div><label>Hour (0–23)</label><input type="number" name="hr" min="0" max="23" value="{{values.hr}}" required></div>
+<div><label>Weekday (0=Sunday)</label><input type="number" name="weekday" min="0" max="6" value="{{values.weekday}}" required></div>
+<div><label>Weather</label><select name="weathersit">{% for n,t in [(1,'Clear / partly cloudy'),(2,'Mist / cloudy'),(3,'Light rain / snow'),(4,'Heavy rain / snow')] %}<option value="{{n}}" {% if values.weathersit==n %}selected{% endif %}>{{t}}</option>{% endfor %}</select></div>
+<div><label>Holiday (0=no, 1=yes)</label><select name="holiday"><option value="0">No</option><option value="1">Yes</option></select></div>
+<div><label>Working day (0=no, 1=yes)</label><select name="workingday"><option value="1">Yes</option><option value="0">No</option></select></div>
+<div><label>Temperature (0–1)</label><input type="number" step="0.01" min="0" max="1" name="temp" value="{{values.temp}}" required></div>
+<div><label>Feels-like temperature (0–1)</label><input type="number" step="0.01" min="0" max="1" name="atemp" value="{{values.atemp}}" required></div>
+<div><label>Humidity (0–1)</label><input type="number" step="0.01" min="0" max="1" name="hum" value="{{values.hum}}" required></div>
+<div><label>Wind speed (0–1)</label><input type="number" step="0.01" min="0" max="1" name="windspeed" value="{{values.windspeed}}" required></div>
+</div>
+<button type="submit">Predict Bike Demand</button>
+</form>
+</section>
+<section class="card">
+<h2>Prediction</h2>
+<p class="muted">The model estimates the number of bikes likely to be rented during the selected hour.</p>
+{% if prediction is not none %}
+<div class="result"><div class="number">{{prediction}}</div><strong>estimated rentals per hour</strong></div>
+<p class="muted">Use this estimate as a planning aid. Actual demand can vary with local events and conditions.</p>
+{% elif error %}
+<div class="error">{{error}}</div>
+{% else %}
+<div class="result"><div class="number">—</div><strong>Your prediction will appear here</strong></div>
+{% endif %}
+<p class="muted"><b>Model:</b> Random Forest Regression<br><b>Dataset:</b> UCI Bike Sharing Dataset<br><b>Deployment:</b> Flask web app + JSON API</p>
+</section>
+</main>
+<footer>EcoRide AI · Academic machine-learning capstone project</footer>
+</body></html>
